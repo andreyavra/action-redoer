@@ -41,22 +41,26 @@ start_time = time.time()
 
 # Write File Function
 def writeFile():
+    '''Writes the actions made by the user to a file. In main thread.'''
     del actions[0]
-    with open("log.andreyiscool", 'w') as f:
+    print('Writing File...')
+    with open('population.vfd', 'w') as f:
+        # Putting the actions into the file as a json file
         json.dump(actions, f)
+    print("Done!")
 
 
 
 
 # Keyboard Functions
 def key_onPress(key):
+    '''Triggering off the press of a key, logs that key. In Key Thread.'''
     # Threaded in key_thread
 
     # [KEY_TYPED, ['ukldsfjkdsj\n'], time]
 
     # Turning key into a usable string
     key = str(key).replace("'", '')
-    print(key)
 
     # Turning space into a character
     if key == "Key.space": 
@@ -64,9 +68,8 @@ def key_onPress(key):
 
     if key == "Key.enter":
         key = '\n' 
-        print("working 1")
     
-    # If the user pressed backspace
+    # If the user pressed backspace, removing last letter
     if key == "Key.backspace":
         # Removing last character from latest action
         if actions[LATEST_ACTION][ID] == KEY_TYPED:
@@ -77,22 +80,22 @@ def key_onPress(key):
             else:
                 actions[LATEST_ACTION][CONTENT] = prev_data[:-1]
                 actions[LATEST_ACTION][TIME_STAMP] = time.time()-start_time
-
     if "Key" not in key:
-        print("working 2")
         # Merging data
         if actions[LATEST_ACTION][ID] == KEY_TYPED:
             actions[LATEST_ACTION][CONTENT] = actions[LATEST_ACTION][CONTENT] + key
         else:
             actions.append([KEY_TYPED, key, time.time()-start_time])
-        print("{0} pressed".format(key))
+
+
 
 
 def key_onRelease(key):
-    ''' Turns the release of "escape" into a way to exit the program '''
-    # Threaded in key_thread
+    '''Triggering off the press of a key, exits the program on escape. In Key Thread.'''
     if key == Key.esc:
+        print("ESC key pressed. Actions no longer logged.")
         writeFile()
+        print("Terminating program.")
         sys.exit()
 
         
@@ -101,13 +104,12 @@ def key_onRelease(key):
 
 # Mouse Functions
 def onMove(x,y):
+    '''Triggering off the movement of the mouse, logs it to actions. In Mouse Thread'''
+    # Generalising data for better storage
     command = (int(x/2)*2, int(y/2)*2)
-    print(command)
     # Optimizing data by removing irrelevant actions
     if actions[LATEST_ACTION][ID] == MOUSE_MOVE:
-        print("this is proccing 1")
         if actions[LATEST_ACTION][CONTENT] != command:
-            print("this is proccing2")
             actions.append((MOUSE_MOVE, command, time.time()-start_time))
     else:
         actions.append((MOUSE_MOVE, command, time.time()-start_time))
@@ -116,47 +118,35 @@ def onMove(x,y):
 
 
 def onClick(x, y, button, pressed):
-    print(pressed)
+    '''Triggering off the clicking and release of the mouse, logs it to actions. In Mouse Thread'''
     button = str(button)
     if button == "Button.middle": button = MIDDLE_BUTTON
     elif button == "Button.left": button = LEFT_BUTTON
     else: button = RIGHT_BUTTON
 
     actions.append((MOUSE_CLICK, ((int(x), int(y)), button, pressed), time.time()-start_time))
-    
-    print('{0} {1} at {2}'.format('Pressed' if pressed else 'Released', button, (x, y)))
-
-
 
 
 
 def onScroll(x, y, dx, dy):
-    # WTF WHY DOES IT ROUND TO INT?
-
-    # if actions[LATEST_ACTION][ID] == MOUSE_SCROLL:
-    #     prev_scro
-
+    '''
+    Triggering off the clicking and release of the mouse, logs it to actions. In Mouse Thread. 
+    Not recommended for use, as it is buggy.
+    '''
     action = (dx, dy)
     actions.append((MOUSE_SCROLL, action, time.time()-start_time))
 
 
 
 
-
-
-
-
-
-
-
-
 # Listener functions
 def mouseListener():
+    '''Distributes all mouse actions in the Mouse Thread'''
     with MouseListener(on_move=onMove, on_click=onClick, on_scroll=onScroll) as l:
         l.join()
 
 def keyboardListener():
-    # Threaded in key_thread
+    '''Distributes all keyboard actions in the Key Thread'''
     with KeyboardListener(on_press=key_onPress, on_release=key_onRelease) as listener:
         listener.join()
 
@@ -164,13 +154,18 @@ def keyboardListener():
 
 # Main Function
 if __name__ == "__main__":
+    # Creating 2 new threads
     mouse_thread = threading.Thread(target=mouseListener)
     key_thread = threading.Thread(target=keyboardListener)
 
     # Setting up daemon in mouse_thread to sys.exit() later
     mouse_thread.daemon = True
 
-    # time.sleep(5)
+    print("You have 5 seconds to navigate before tracking begins.")
+    print("Press ESC to terminate the program.")
+    print("Scrolling is not recommended.")
+    time.sleep(5)
+    print("Beginning the logging of actions.")
     
     mouse_thread.start()
     key_thread.start()

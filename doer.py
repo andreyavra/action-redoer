@@ -43,7 +43,7 @@ def typeText(data):
     Keyboard.type(data)
 
 def getData():
-    with open("log.andreyiscool") as f:
+    with open("population.vfd") as f:
         return json.loads(f.read())
 
 
@@ -54,7 +54,7 @@ ACTION_TYPES = {
     3: scroll,
 }
 
-def main():
+def do():
     data = getData()
 
     CURR_TIME_PASSED = 0
@@ -67,4 +67,14 @@ def main():
         CURR_TIME_PASSED = command[TIME_STAMP]
     
 if __name__ == "__main__":
-    main()
+    repeat = int(input("How often do you want the code to repeat (in hours) (enter as just a number)? "))*60*60
+    print("Beginning repetition in 5 seconds. Press control+C in this window to exit the program.")
+    time.sleep(5)
+    
+    while True:
+        start_time = time.time()
+        do()
+        end_time = time.time()
+        time.sleep(repeat-end_time+start_time)
+        
+
