@@ -38,13 +38,15 @@ MIDDLE_BUTTON = 2
 actions = ['placeholder']
 start_time = time.time()
 
+file_name = 'default.vfd'
+
 
 # Write File Function
 def writeFile():
     '''Writes the actions made by the user to a file. In main thread.'''
     del actions[0]
     print('Writing File...')
-    with open('population.vfd', 'w') as f:
+    with open(file_name, 'w') as f:
         # Putting the actions into the file as a json file
         json.dump(actions, f)
     print("Done!")
@@ -158,9 +160,10 @@ if __name__ == "__main__":
     mouse_thread = threading.Thread(target=mouseListener)
     key_thread = threading.Thread(target=keyboardListener)
 
+    file_name = input("Name the sequence you would like to create (alphanumeric characters): ").replace(' ','_') + '.vfd'
+
     # Setting up daemon in mouse_thread to sys.exit() later
     mouse_thread.daemon = True
-
     print("You have 5 seconds to navigate before tracking begins.")
     print("Press ESC to terminate the program.")
     print("Scrolling is not recommended.")

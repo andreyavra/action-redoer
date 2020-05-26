@@ -42,8 +42,8 @@ def scroll(data):
 def typeText(data):
     Keyboard.type(data)
 
-def getData():
-    with open("population.vfd") as f:
+def getData(file_name):
+    with open(file_name) as f:
         return json.loads(f.read())
 
 
@@ -54,9 +54,7 @@ ACTION_TYPES = {
     3: scroll,
 }
 
-def do():
-    data = getData()
-
+def do(data):
     CURR_TIME_PASSED = 0
     for command in data:
         # Waiting until activation time
@@ -66,15 +64,45 @@ def do():
         # Setting new activation time
         CURR_TIME_PASSED = command[TIME_STAMP]
     
+
+def getNextTime(time_until_next):
+    curr_time = time.strftime('%H:%M:%S')
+
+    hrs, mins, secs = [int(i) for i in curr_time.split(':')]
+    secs += int(time_until_next)
+
+    mins += int(secs/60)
+    secs = secs%60
+    hrs += int(mins/60)
+    mins = mins%60
+    hrs = hrs%24
+
+    return str(hrs)+':'+str(mins)+':'+str(secs)
+
+
+
+
 if __name__ == "__main__":
+    print(type(time.strftime('%H:%M:%S')))
+    file_name = input("What sequence do you want to run (without the .vfd)? ").replace(' ','_') + '.vfd'
     repeat = int(input("How often do you want the code to repeat (in hours) (enter as just a number)? "))*60*60
     print("Beginning repetition in 5 seconds. Press control+C in this window to exit the program.")
     time.sleep(5)
+
+    data = getData(file_name)
     
     while True:
         start_time = time.time()
-        do()
+
+        print("Beginning action sequence at", time.strftime('%H:%M:%S'))
+        do(data)
+        print("Finishing action sequence at", time.strftime('%H:%M:%S'))
+
         end_time = time.time()
+        time_until_next = repeat-end_time + start_time
+        next_seq_time = getNextTime(time_until_next)
+
+        print("Running next sequence at", next_seq_time)
         time.sleep(repeat-end_time+start_time)
         
 
