@@ -11,10 +11,12 @@ MOUSE_RELEASE = 3
 MOUSE_SCROLL = 4
 '''
 import threading
-import time, sys, json
+import time, sys, json, ctypes
 
 from pynput.mouse import Listener as MouseListener
 from pynput.keyboard import Listener as KeyboardListener, Key
+
+PROCESS_PER_MONITOR_DPI_AWARE = 2
 
 X_COORD = 0
 Y_COORD = 1
@@ -156,6 +158,8 @@ def keyboardListener():
 
 # Main Function
 if __name__ == "__main__":
+    ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
+    
     # Creating 2 new threads
     mouse_thread = threading.Thread(target=mouseListener)
     key_thread = threading.Thread(target=keyboardListener)
@@ -164,6 +168,7 @@ if __name__ == "__main__":
 
     # Setting up daemon in mouse_thread to sys.exit() later
     mouse_thread.daemon = True
+    
     print("You have 5 seconds to navigate before tracking begins.")
     print("Press ESC to terminate the program.")
     print("Scrolling is not recommended.")

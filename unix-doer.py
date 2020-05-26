@@ -83,7 +83,6 @@ def getNextTime(time_until_next):
 
 
 if __name__ == "__main__":
-    print(type(time.strftime('%H:%M:%S')))
     file_name = input("What sequence do you want to run (without the .vfd)? ").replace(' ','_') + '.vfd'
     repeat = int(input("How often do you want the code to repeat (in hours) (enter as just a number)? "))*60*60
     print("Beginning repetition in 5 seconds. Press control+C in this window to exit the program.")
