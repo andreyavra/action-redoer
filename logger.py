@@ -11,12 +11,11 @@ MOUSE_RELEASE = 3
 MOUSE_SCROLL = 4
 '''
 import threading
-import time, sys, json, ctypes
+import time, sys, json, platform
 
 from pynput.mouse import Listener as MouseListener
 from pynput.keyboard import Listener as KeyboardListener, Key
 
-PROCESS_PER_MONITOR_DPI_AWARE = 2
 
 X_COORD = 0
 Y_COORD = 1
@@ -158,8 +157,11 @@ def keyboardListener():
 
 # Main Function
 if __name__ == "__main__":
-    ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
-    
+    # Windows has a weird system for applications, and this reverts it
+    if platform.system() == "Windows":
+        process_per_monitor_dpi_aware = 2
+        ctypes.windll.shcore.SetProcessDpiAwareness(process_per_monitor_dpi_aware)
+
     # Creating 2 new threads
     mouse_thread = threading.Thread(target=mouseListener)
     key_thread = threading.Thread(target=keyboardListener)

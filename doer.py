@@ -1,4 +1,4 @@
-import time, json
+import time, json, platform
 from pprint import pprint
 
 from pynput.mouse import Button, Controller as MouseController
@@ -83,6 +83,11 @@ def getNextTime(time_until_next):
 
 
 if __name__ == "__main__":
+    # Windows has a weird system for applications, and this reverts it
+    if platform.system() == "Windows":
+        process_per_monitor_dpi_aware = 2
+        ctypes.windll.shcore.SetProcessDpiAwareness(process_per_monitor_dpi_aware)
+
     file_name = input("What sequence do you want to run (without the .vfd)? ").replace(' ','_') + '.vfd'
     repeat = int(input("How often do you want the code to repeat (in hours) (enter as just a number)? "))*60*60
     print("Beginning repetition in 5 seconds. Press control+C in this window to exit the program.")
