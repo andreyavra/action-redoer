@@ -1,5 +1,7 @@
 # Action Redoer by Andrey Avramenko
 
+REMOVER DOESN'T WORK YET GIMME A FEW DAYS
+
 License included
 
 Run `logger.py`, and you have 5 seconds delay to get to where you want the keyboard and mouse recording to start. The logger works for all actions except scrolling. These actions are then stored in the `log.andreyiscool` file. 
